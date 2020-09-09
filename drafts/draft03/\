@@ -1,0 +1,158 @@
+'use strict'
+
+
+
+let canvasWidth, canvasHeight;
+let canvasDiv = document.getElementById("draft03_div");
+let canvas;
+
+let numRows, numCols, offX, offY, orgX, orgY, maxX, maxY, lngth, hght, sz, bg, fg;
+
+let tieUp, tieUpBox;
+
+let waveL, waveR;
+
+function setup() {
+
+    //init canvaiv');
+    canvasWidth = canvasDiv.offsetWidth;
+    canvasHeight = canvasDiv.offsetHeight;
+
+    canvas = createCanvas(canvasWidth, canvasHeight);
+    canvas.parent('draft03_div');
+
+
+    // init vars
+    numRows = 4;
+    numCols = 4;
+    hght = canvasHeight*0.15;
+    offX = 20;
+    offY = canvasHeight/2 - (hght / 2);
+    orgX = offX;
+    orgY = offY;
+    maxX = canvasWidth - offX;
+    maxY = canvasHeight - offY;
+    lngth = maxX - orgX;
+    sz = hght/numRows;
+    bg = 255;
+    fg = 0;
+
+    init_tieUp();
+
+    waveL = new WaveLine(orgX, width/2 - hght/2, canvasHeight/2 - hght/2, hght, 10, false);
+    waveR = new WaveLine(maxX, width/2 + hght/2, canvasHeight/2 - hght/2, hght, 10, true);
+
+    background(bg);
+}
+
+
+function windowResized() {
+    // setup();
+    canvasWidth = canvasDiv.offsetWidth;
+    canvasHeight = canvasDiv.offsetHeight;
+    resizeCanvas(canvasWidth, canvasHeight);
+    setup();
+    background(bg);
+}
+
+
+function draw() {
+    background(bg);
+    threadLines();
+
+    draw_tieUpBox();
+    waveL.draw_wave();
+    waveL.update_wave();
+    waveR.draw_wave();
+    waveR.update_wave();
+
+    vertCheck(waveL.returnCurrPos());
+    // console.log(waveL.returnCurrPos());
+
+    ellipse(width/2, mouseY, 5, 5);
+    
+
+}
+
+function mouseDragged() {
+}
+
+function mousePressed() {
+    clickCheck(mouseX, mouseY);
+}
+
+
+function threadLines() {
+    stroke(fg);
+    strokeWeight(1);
+    for (let i = 0; i <= numRows; i++) {
+        let y = i*sz;
+        line(orgX, orgY+y, maxX, orgY+y);
+    }
+}
+
+        
+
+function init_tieUp() {
+    tieUpBox =  {
+        posX: lngth/2 - (hght/2) + orgX,
+        posY: orgY,
+        boxWidth: hght,
+        boxHeight: hght
+    };
+
+    tieUp = init2dArray(numCols, numRows);
+
+    for (let i = 0; i < tieUp.length ; i++) {
+        for (let j = 0; j < tieUp[0].length; j++) {
+            let tieUpX = tieUpBox.posX + (i*sz);
+            let tieUpY = tieUpBox.posY + (j*sz);
+            let randomState = random(2)>=1?true:false;
+            tieUp[i][j] = new Cell(tieUpX, tieUpY, sz, sz * 0.6, randomState);
+        } 
+    }
+}
+
+function draw_tieUpBox() {
+    noFill();
+    stroke(fg);
+    strokeWeight(2);
+    rect(tieUpBox.posX, tieUpBox.posY, tieUpBox.boxWidth, tieUpBox.boxHeight);
+
+    strokeWeight(1);
+    for (let i = 0; i < numCols; i++) {
+        for (let j = 0; j < numRows; j++) {
+            let x = sz*i;
+            let y = sz*j;
+            line(tieUpBox.posX, tieUpBox.posY + y, tieUpBox.posX + tieUpBox.boxWidth, tieUpBox.posY + y,);
+            line(tieUpBox.posX + x, tieUpBox.posY, tieUpBox.posX + x, tieUpBox.posY + tieUpBox.boxHeight);
+        }
+    }
+    
+    for (let i = 0; i < tieUp.length; i++) {
+        for (let j = 0; j < tieUp[0].length; j++) {
+            tieUp[i][j].drawCell();
+        }
+    }
+}
+
+function clickCheck(_x, _y) {
+    for (let i = 0; i < tieUp.length; i++) {
+        for (let j = 0; j < tieUp[0].length; j++) {
+            if (tieUp[i][j].withinBounds(_x, _y)) {
+                tieUp[i][j].stateFlip();
+            }
+        }
+    }
+}
+
+function vertCheck(_vrtx) {
+    for (let i = 0; i < tieUp.length; i++) {
+        // for (let j = 0; j < tieUp[0].length; j++) {
+            if (tieUp[i][0].withinYbound(mouseY)) {
+                console.log("yaioi");
+            // }
+        }
+    }
+}
+

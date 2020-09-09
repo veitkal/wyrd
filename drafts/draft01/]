@@ -1,0 +1,801 @@
+//DRAFT class
+
+class Draft {
+
+
+  constructor(_numWarps, _numShafts, _width, _height, _padding, _bg, _fg) {
+
+    this.numWarps = _numWarps;
+    this.numShafts = _numShafts;
+    this.width = _width;
+    this.padding = _padding;
+    this.bg = _bg;
+    this.fg = _fg;
+
+    this.maxWidth = this.width; //size of each cell in grid
+    // this.cellWidth = this.width/this.numWarps; //size of each cell in grid
+    this.cellWidth = this.maxWidth/this.numWarps; //size of each cell in grid
+    this.cellPad = this.cellWidth * _padding; // padding between boxes
+    this.cellSize = this.cellWidth - this.cellPad; // size of actuall filled cell
+    this.boxWidth = this.cellWidth * this.numShafts;
+    this.boxPad = this.boxWidth * 0.5; //CHANGE TO BE DYNAMIC
+    // this.boxPad = 10; //CHANGE TO BE DYNAMIC
+    //!!! (_height % this.cellWidth) ASSURES DYNAMIC DRAWING OF ANY HEIGHT
+    this.originOff = this.boxPad;
+    this.originOff = (canvasWidth - (this.width + this.boxPad + this.boxWidth))/2;
+    // this.height = _height - (this.originOff * 0.5) - ((_height-(this.originOff * 0.5))% this.cellWidth);
+    this.height = (_height) - (_height%this.cellWidth);
+
+
+    this.numWeft = round(this.height/this.cellWidth);
+
+    this.shafts = [];
+    this.threading = Array(this.numWarps).fill([]).map(e=>Array(this.numWarps).fill(0));
+    this.tieUp = [];
+    this.treadling = [];
+    this.drawDown = [];
+    this.warpGrid = [];
+    this.tieUpGrid = [];
+    this. treadlingGrid = [];
+
+    //KEEP THE SAME OTHERWISE IT BECOMES UNEAVEN ||| FIX FIX FIX
+    this.outLineWeight = 4; //strokeWeight of outline 
+    this.lineWeight = 4; //strokeWeight of gridLine
+    this.updateRate = 1;
+  }
+
+  //RESET
+  resetDraft(_numWarps, _numShafts, _width, _height, _padding, _bg, _fg) {
+    this.numWarps = _numWarps;
+    this.numShafts = _numShafts;
+    this.width = _width;
+    this.padding = _padding;
+    this.bg = _bg;
+    this.fg = _fg;
+
+    this.maxWidth = this.width; //size of each cell in grid
+    // this.cellWidth = this.width/this.numWarps; //size of each cell in grid
+    this.cellWidth = this.maxWidth/this.numWarps; //size of each cell in grid
+    this.cellPad = this.cellWidth * _padding; // padding between boxes
+    this.cellSize = this.cellWidth - this.cellPad; // size of actuall filled cell
+    this.boxWidth = this.cellWidth * this.numShafts;
+    this.boxPad = this.boxWidth * 0.5; //CHANGE TO BE DYNAMIC
+    // this.boxPad = 10; //CHANGE TO BE DYNAMIC
+    //!!! (_height % this.cellWidth) ASSURES DYNAMIC DRAWING OF ANY HEIGHT
+    this.originOff = this.boxPad;
+    this.originOff = (canvasWidth - (this.width + this.boxPad + this.boxWidth))/2;
+    // this.height = _height - (this.originOff * 0.5) - ((_height-(this.originOff * 0.5))% this.cellWidth);
+    this.height = (_height) - (_height%this.cellWidth);
+
+
+    this.numWeft = round(this.height/this.cellWidth);
+
+    this.shafts = [];
+    this.tieUp = [];
+    this.treadling = [];
+    this.drawDown = [];
+    this.warpGrid = [];
+    this.tieUpGrid = [];
+    this. treadlingGrid = [];
+
+    //KEEP THE SAME OTHERWISE IT BECOMES UNEAVEN ||| FIX FIX FIX
+    this.outLineWeight = 4; //strokeWeight of outline 
+    this.lineWeight = 4; //strokeWeight of gridLine
+  }
+  //MASTER SETUP/UPDATE/DRAW FUNCTIONS
+  setupDraft() {
+    this.setupWarpGrid();
+    this.setupTieUpGrid();
+    this.setupTreadlingGrid();
+
+    this.threadingStatePlain();
+    this.tieUpStateRandom();
+    this.treadlingStateTriangle();
+
+    this.setupThreadingPlain();
+    this.setupTieUp();
+    this.setupTreadling();
+    this.setupDrawdown();
+    // this.calcDrawDown();
+    this.calcDrawDownCells();
+  }
+
+  updateDraft() {
+    // this.updateThreading();
+    // this.updateTieUp();
+    // this.updateTreadling();
+    this.updateDrawdown();
+    this.calcDrawDownCells();
+  }
+
+  drawDraft() {
+    // this.drawGrids();
+    this.drawThreading();
+    this.drawTieUp();
+    this.drawTreadling();
+    this.drawDrawdown();
+
+  }
+
+  //--------------------------------------------------------------
+  //SETUP FUNCTIONS//
+  //////////////////
+  //
+  setupWarpGrid() {
+    this.warpGrid.length = 0; //clear array
+    this.warpGrid = init2dArray(this.numShafts, this.numWarps);
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.warpGrid[i].length; j++) {
+        let off = this.cellPad/2;
+        let x = this.originOff + this.width - this.cellWidth - (this.cellWidth * j);
+        let y = this.originOff + this.boxWidth - this.cellWidth - (this.cellWidth*i);
+
+        this.warpGrid[i][j] = new Cell(x, y, this.cellSize, this.cellPad, true); 
+      }
+    }
+  }
+
+  setupTieUpGrid() {
+    this.tieUpGrid.length = 0; //clear array
+    this.tieUpGrid = init2dArray(this.numShafts, this.numShafts);
+
+    for (let i = 0; i < this.tieUpGrid.length; i++) {
+      for (let j = 0; j < this.tieUpGrid.length; j++) {
+        this.tieUpGrid[i][j] = floor(random(2));
+        let tieUpX = this.originOff + this.width + this.boxPad;
+        let tieUpY = this.originOff + 0;
+        let x = tieUpX + i * this.cellWidth;
+        let y = tieUpY + this.boxWidth - this.cellWidth - j * this.cellWidth;
+        this.tieUpGrid[i][j] = new Cell(x, y, this.cellSize, this.cellPad, true);
+      }
+    }
+  }
+
+  setupTreadlingGrid() {
+    this.treadlingGrid.length = 0; //clear array
+    this.treadlingGrid = init2dArray(this.numWeft, this.numShafts);
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        let treadlingX = this.originOff + this.width + this.boxPad;
+        let treadlingY = this.originOff + this.boxWidth + this.boxPad;
+        let x = treadlingX + j * this.cellWidth;
+        let y = treadlingY + i*this.cellWidth;
+        this.treadlingGrid[i][j] = new Cell(x, y, this.cellSize, this.cellPad, true);
+
+      }
+    }
+  }
+
+  //INITIAL STATES//
+  /////////////////
+
+  //THREADGING FOR PLAIN WEAVE
+  //101010101010101010 with shift every other shaft
+  threadingStatePlain() {
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.warpGrid[i].length; j++) {
+
+        // let tempState = ((j + i%2) % 2)!=0?true:false;
+        let tempState = ((j + i) % this.numShafts)!=0?false:true;
+        this.warpGrid[i][j].state = tempState; 
+      }
+    }
+  }
+
+  threadingStateRandom() {
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.warpGrid[i].length; j++) {
+
+        // let tempState = ((j + i%2) % 2)!=0?true:false;
+        this.warpGrid[i][j].state = floor(random(2))!=0?true:false;
+
+      }
+    }
+  }
+  //RANDOM TIEUP
+  tieUpStateRandom() {
+    for (let i = 0; i < this.tieUpGrid.length; i++) {
+      for (let j = 0; j < this.tieUpGrid.length; j++) {
+        this.tieUpGrid[i][j].state = floor(random(2))!=0?true:false;
+      }
+    }
+  }
+  //PLAIN TIEUP
+  tieUpStatePlain() {
+    for (let i = 0; i < this.tieUpGrid.length; i++) {
+      for (let j = 0; j < this.tieUpGrid.length; j++) {
+        let tempState =(i+j)%2; 
+        this.tieUpGrid[i][j].state = tempState!=0?true:false;
+      }
+    }
+  }
+
+  //TWILL TIEUP
+  tieUpStateTwill() {
+    for (let i = 0; i < this.tieUpGrid.length; i++) {
+      for (let j = 0; j < this.tieUpGrid.length; j++) {
+        let tempState =(i+j)%4;
+        // this.tieUpGrid[i][j].state = tempState!=0?true:false;
+        if (tempState === 0 || tempState === 1) {
+          this.tieUpGrid[i][j].state = true;
+        } else {
+          this.tieUpGrid[i][j].state = false;
+        }
+      }
+    }
+  }
+
+  //RANDOM TREADLING
+  treadlingStateRandom() {
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        this.treadlingGrid[i][j].state = floor(random(2))!=0?true:false;
+      }
+    }
+  }
+  //SIMPLE RANDOM TREADLING 
+  treadlingStateRS() {
+    // for (let i = 0; i < this.treadlingGrid.length; i++) {
+    //     let tempRand = floor(random(this.treadlingGrid[i].length));
+    //     for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+    //         if(tempRand === j) {
+    //             this.treadlingGrid[i][j].state = false; //         }
+    //     }
+    // }
+    this.treadling.length = 0; //clear array
+    this.treadling.length = this.numWeft;
+    for (let i = 0; i < this.treadling.length; i++) {
+      this.treadling[i] = i % this.numShafts;
+      this.treadling[i] = floor(random(this.numShafts));
+    }
+
+    //to use with treadling array
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        if(this.treadling[i] === j) {
+          this.treadlingGrid[i][j].state = true;
+        } else {
+          this.treadlingGrid[i][j].state = false;
+        }
+      }
+    }
+  }
+
+
+  treadlingStateRamp() {
+    this.treadling.length = 0; //clear array
+    this.treadling.length = this.numWeft;
+    for (let i = 0; i < this.treadling.length; i++) {
+      //start at 1
+      this.treadling[i] = i % this.numShafts;
+      //start at max 
+      this.treadling[i] = abs((i % this.numShafts) - (this.numShafts-1));
+    }
+
+    //to use with treadling array
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        if(this.treadling[i] === j) {
+          this.treadlingGrid[i][j].state = true;
+        } else {
+          this.treadlingGrid[i][j].state = false;
+        }
+      }
+    }
+  }
+
+  treadlingStateTriangle() {
+    this.treadling.length = 0; //clear array
+    this.treadling.length = this.numWeft;
+    let x = 0;
+    for (let i = 0; i < this.treadling.length; i++) {
+      //REF https://stackoverflow.com/questions/1073606/is-there-a-one-line-function-that-generates-a-triangle-wave
+      this.treadling[i] = floor(abs((x++ % (this.numShafts*2-2)) - ((this.numShafts-1))));
+    }
+
+    //to use with treadling array
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        if(this.treadling[i] === j) {
+          this.treadlingGrid[i][j].state = true;
+        } else {
+          this.treadlingGrid[i][j].state = false;
+        }
+      }
+    }
+  }
+  ////------
+
+  //SETUP BLANC THREADING
+  setupThreadingBlanc() {
+    this.shafts.length = 0; //clear array
+    this.shafts = init2dArray(this.numShafts, this.numWarps);
+
+  }
+
+  //SETUP SHAFTS FOR PLAIN WEAVE
+  //101010101010101010 with shift every other shaft
+  setupThreadingPlain() {
+    this.shafts.length = 0; //clear array
+    this.shafts = init2dArray(this.numShafts, this.numWarps);
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.shafts[i].length; j++) {
+        this.shafts[i][j] = (j + i%2) % 2; 
+      }
+    }
+  }
+
+  //SETUP RAMP FORM, eg "1234 1234 1234 1234"
+  setupThreadingRamp() {
+    this.shafts.length = 0; //clear array
+    this.shafts = init2dArray(this.numShafts, this.numWarps);
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.shafts[i].length; j++) {
+        //!=1?0:1 to make it binary (eg if not 0)
+        this.shafts[i][j] = (1 + (j - i%this.numShafts) % this.numShafts)!=1?0:1;
+      }
+    }
+  }
+
+  //SETUP RANDOM THREADING
+  setupThreadingRandom() {
+    //innit shafts
+    this.shafts.length = 0; //clear array
+    this.shafts = init2dArray(this.numShafts, this.numWarps);
+
+    // // populate shafts
+    for (let i = 0; i < this.shafts.length; i++) {
+      for (let j = 0; j < this.shafts[i].length; j++) {
+        this.shafts[i][j] = floor(random(2)); 
+      }
+    }
+  }
+
+  setupTieUp() {
+
+    //init tieUp
+    this.tieUp.length = 0; //clear array
+    this.tieUp = init2dArray(this.numShafts, this.numShafts);
+
+    //random populate tieUp
+    for (let i = 0; i < this.tieUp.length; i++) {
+      for (let j = 0; j < this.tieUp.length; j++) {
+        this.tieUp[i][j] = floor(random(2));
+      }
+    }
+  }
+
+
+  setupTreadling() {
+    //     this.treadling.length = 0; //clear array
+    //     this.treadling.length = this.numWeft;
+    //     for (let i = 0; i < this.treadling.length; i++) {
+    //         this.treadling[i] = i % this.numShafts;
+    //         this.treadling[i] = floor(random(this.numShafts));
+    //     }
+  }
+
+  setupDrawdown() {
+    this.drawDown.length = 0;
+    this.drawDown = init2dArray(this.numWeft, this.numWarps);
+
+  }
+
+  //--------------------------------------------------------------
+  //UPDATE FUNCTIONS
+
+  updateThreading() {
+    // this.threading.length = this.numWarps;
+    if (frameCount%this.updateRate === 0) {
+      let noiseVal = noise(frameCount*sin(frameCount*0.01)) * this.numWarps;
+      let freq = sin(frameCount*0.002);
+      let tempVal = floor(constrain(sin(frameCount + freq) + noiseVal , 0, this.numWarps));
+      this.threading.unshift(tempVal);
+      this.threading.pop();
+
+      //to use with treadlingGrid array
+      for (let i = 0; i < this.warpGrid.length; i++) {
+        for (let j = 0; j < this.warpGrid[i].length; j++) {
+          if(this.threading[i] === j) {
+            this.warpGrid[i][j].state = true;
+          } else {
+            this.warpGrid[i][j].state = false;
+          }
+        }
+      }
+
+    }
+  }
+
+  updateTieUp() {
+    // if (frameCount%this.updateRate === 0) {
+    //   golGenerate(this.tieUpGrid);
+    // }
+  }
+
+  updateTreadling() {
+    // if (frameCount%this.updateRate === 0) {
+    //   golGenerate(this.treadlingGrid);
+    // }
+
+      //REF https://stackoverflow.com/questions/1073606/is-there-a-one-line-function-that-generates-a-triangle-wave
+      // let tempVal = floor(noise(frameCount * 0.2) * this.numShafts);
+
+    if (frameCount%this.updateRate === 0) {
+
+      let noiseVal = noise(frameCount*sin(frameCount*0.01)) * this.numShafts;
+      let freq = sin(frameCount*0.002);
+      let tempVal = floor(constrain(sin(frameCount + freq) + noiseVal , 0, this.numShafts));
+      this.treadling.unshift(tempVal);
+      this.treadling.pop();
+
+      //to use with treadlingGrid array
+      for (let i = 0; i < this.treadlingGrid.length; i++) {
+        for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+          if(this.treadling[i] === j) {
+            this.treadlingGrid[i][j].state = true;
+          } else {
+            this.treadlingGrid[i][j].state = false;
+          }
+        }
+      }
+    }
+
+  }
+
+  updateDrawdown() {
+  }
+
+  //--------------------------------------------------------------
+  //DRAWING FUNCTIONS
+
+  drawGrids() {
+    //background + outline
+    fill(this.bg);
+    stroke(this.fg)
+    strokeWeight(this.outLineWeight);
+    rect(this.originOff, this.originOff, this.width, this.cellWidth*this.numShafts);
+  }
+
+  drawThreading() {
+
+    //background + outline
+    fill(this.bg);
+    stroke(this.fg)
+    strokeWeight(this.outLineWeight);
+    rect(this.originOff, this.originOff, this.width, this.cellWidth*this.numShafts);
+
+    // org drawmode commented out
+    // for (let i = 0; i < this.shafts.length; i++) {
+    //     for (let j = 0; j < this.shafts[i].length; j++) {
+    //         let off = this.cellPad/2;
+    //         let x = this.originOff + this.width - this.cellWidth - (this.cellWidth * j);
+    //         let y = this.originOff + this.boxWidth - this.cellWidth - (this.cellWidth*i);
+
+
+    //         if(this.shafts[i][j] === 1) {
+    //             fill(this.fg);
+    //         } else{
+    //             fill(this.bg);
+    //         }
+
+    //         noStroke();
+    //         rect(x+off, y + off, this.cellSize, this.cellSize);
+
+    //         // rect(x+off, y+off, 40, 40);
+    //     }
+    // }
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.warpGrid[i].length; j++) {
+        this.warpGrid[i][j].drawCell();
+      }
+    }
+
+    //draw grid
+    noFill();
+    stroke(fg);
+    strokeWeight(this.lineWeight);
+
+    for (let i = 0; i < this.numWarps; i++) {
+      for(let j = 0; j < numShafts+1; j++) {
+        let x = this.originOff + i*this.cellWidth;
+        let y = this.originOff + j*this.cellWidth;
+        line(x, this.originOff, x, y);
+        line(x, y, x+this.cellWidth, y);
+      }
+    }
+  }
+
+  drawTieUp() {
+    let tieUpX = this.originOff + this.width + this.boxPad;
+    let tieUpY = this.originOff + 0;
+
+    //background + outline
+    fill(this.bg);
+    stroke(this.fg)
+    strokeWeight(this.outLineWeight);
+    rect(tieUpX,tieUpY, this.boxWidth, this.boxWidth);
+
+    //draw cells
+    noStroke(); 
+
+    // for (let j = 0; j < this.tieUp.length; j++) {
+    //     for (let i = 0; i < this.tieUp.length; i++) {
+    //         let off = this.cellPad/2;
+    //         let x = tieUpX + i * this.cellWidth;
+    //         let y = tieUpY + this.boxWidth - this.cellWidth - j * this.cellWidth;
+
+    //         if (this.tieUp[i][j] === 0) { //checing if threadle is tied to shaft
+    //             fill(bg);
+    //         } else {
+    //             fill(fg);
+    //         }
+
+    //         rect(x+off, y+off, this.cellSize, this.cellSize);
+    //     }
+    // }
+
+    for (let j = 0; j < this.tieUp.length; j++) {
+      for (let i = 0; i < this.tieUp.length; i++) {
+        this.tieUpGrid[i][j].drawCell();
+      }
+    }
+
+    //draw gid
+
+    for (let i = 0; i < this.tieUp.length+1; i++) {
+      for (let j = 0; j < this.numShafts; j++) {
+        noFill();
+        stroke(fg);
+        strokeWeight(this.lineWeight);
+        let y = tieUpY + i*this.cellWidth;
+        let x = tieUpX + j*this.cellWidth;
+        line(x, this.originOff, x, y);
+        line(x, y, x+this.cellWidth, y);
+      }
+    }
+  }
+
+  drawTreadling() {
+    let treadlingX = this.originOff + this.width + this.boxPad;
+    let treadlingY = this.originOff + this.boxWidth + this.boxPad;
+
+    ////draw box
+    fill(this.bg);
+    stroke(this.fg)
+    strokeWeight(this.outLineWeight);
+    rect(treadlingX, treadlingY, this.boxWidth, this.height);
+
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        this.treadlingGrid[i][j].drawCell();
+      }
+    }
+
+    //draw grid
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.numWeft; j++) {
+        let off = this.cellPad/2;
+        let x = treadlingX + i * this.cellWidth;
+        let y = treadlingY + j*this.cellWidth;
+
+        //grid colors
+        noFill();
+        strokeWeight(this.lineWeight);
+        stroke(this.fg)
+
+        line(x, y, x, y+this.cellWidth);
+        line(x, y, x+this.cellWidth, y);
+
+        // draw cells
+        // noStroke(); 
+        //     fill(this.bg);
+        // rect(x+off, y+off, this.cellSize, this.cellSize); //all cells filled w bg
+        //     fill(this.fg);
+        //     rect(treadlingX+off+(this.cellWidth*this.treadling[j]), y+off, this.cellSize, this.cellSize); //marked cells filled with fg
+
+        /////REMOOOOOOVEEEEE////
+        //draw cells
+        // noStroke(); 
+        // if(this.treadling[j] === 0) {
+        //     fill(this.bg);
+        //     rect(x+off, y+off, this.cellSize, this.cellSize);
+        //     fill(this.fg);
+        //     rect(treadlingX+off, y+off, this.cellSize, this.cellSize); //marked
+        // }
+        // if(this.treadling[j] === 1) {
+        //     fill(this.bg);
+        //     rect(x+off, y+off, this.cellSize, this.cellSize);
+        //     fill(this.fg);
+        //     rect(treadlingX+off+(this.cellWidth), y+off, this.cellSize, this.cellSize);
+        // }
+        // if(this.treadling[j] === 2) {
+        //     fill(this.bg);
+        //     rect(x+off, y+off, this.cellSize, this.cellSize);
+        //     fill(this.fg);
+        //     rect(treadlingX+off+(this.cellWidth*2), y+off, this.cellSize, this.cellSize);
+        // }
+        // if(this.treadling[j] === 3) {
+        //     fill(this.bg);
+        //     rect(x+off, y+off, this.cellSize, this.cellSize);
+        //     fill(this.fg);
+        //     rect(treadlingX+off+(this.cellWidth*3), y+off, this.cellSize, this.cellSize);
+        // }
+      }
+    }
+
+
+  }
+
+  drawDrawdown() {
+    //draw box
+    let drawDownX = this.originOff;
+    let drawDownY = this.originOff + this.boxWidth+this.boxPad;
+    let off = this.cellPad/2;
+
+    ////draw box
+    fill(this.bg);
+    stroke(this.fg)
+    strokeWeight(this.outLineWeight);
+    rect(drawDownX, drawDownY, this.width, this.height);
+
+    //draw cells
+    for (let i = 0; i < this.drawDown.length; i++) {
+      for (let j = 0; j < this.numWarps; j++) {
+        let x = this.originOff + this.width - this.cellWidth - (this.cellWidth * j);
+        let y = this.originOff + this.boxWidth + this.boxPad + (this.cellWidth * i);
+
+        noStroke();
+
+        if (this.drawDown[i][j] === 0) {
+          fill(bg);
+        } else if (this.drawDown[i][j] > 0){
+          fill(fg);
+        }
+
+        rect(x + off, y + off, this.cellSize, this.cellSize);
+      }
+    }
+
+    //draw grid
+    noFill();
+    stroke(fg);
+    strokeWeight(this.lineWeight);
+    for(let i = 0; i < this.numWarps; i++) {
+      for(let j = 0; j < this.numWeft; j++) {
+        let x = this.originOff + i*this.cellWidth;
+        let y = j*this.cellWidth;
+        // line(x,drawDownY, x, drawDownY+this.height);
+        // line(drawDownX, y+drawDownY, drawDownX+this.width, y+drawDownY);
+      }
+    }
+  }
+
+
+  calcDrawDown() { //NOT WORKING
+    for (let i = 0; i < this.drawDown.length; i++) {
+      let tempArr = []; 
+      tempArr.length = this.numWarps;
+      let tempShaftAdd = [];
+      let tempShaft = [];
+      tempShaft.length = this.numWarps;
+      tempShaftAdd.length = this.numWarps;
+
+      //looping over the number of warps/drawDown horizontally
+      for (let j = 0; j < this.numWarps; j++) {
+        let tempVal = 0;
+        let idx = this.treadling[i];
+        for (let k = 0; k < this.numShafts; k++) {
+          //looping over shafts
+          //checking treadle state/what treadle is used
+          tempShaft[j] = this.shafts[k][j] * this.tieUp[idx][k];
+          tempVal += this.shafts[k][j] * this.tieUp[idx][k];
+
+        }
+        if(tempVal > 0) {
+          tempVal = 1;
+        }
+        tempArr[j] = tempVal;
+      }
+      this.drawDown[i] = tempArr;
+    }
+  }
+
+  calcDrawDownCells() {
+    //calculating the drawDown from the threading/tieUp/treadling
+    //states are converted to integers 1/0 and multiplied as to establish if a warp thread is
+    //lifted or not. A bit messy and should be reworked but its the smoothest solution to date.
+    //
+
+    for (let i = 0; i < this.drawDown.length; i++) {
+      let tempArr = []; 
+      tempArr.length = this.numWarps;
+
+      ////looping over the number of warps/drawDown horizontally
+      for (let j = 0; j < this.numWarps; j++) {
+        let tempVal = 0;
+        for (let k = 0; k < this.numShafts; k++) {
+          for (let l = 0; l < this.numShafts; l++) {
+            let tempWarpState = this.warpGrid[l][j].state?1:0;
+            let tempTieUpState = (this.tieUpGrid[k][l].state?1:0) * (this.treadlingGrid[i][k].state?1:0);
+            let tempMultiState = tempWarpState * tempTieUpState;
+            //        //looping over shafts
+            //        //checking treadle state/what treadle is used
+            tempVal += tempMultiState;
+          }
+
+        }
+        if(tempVal > 0) {
+          tempVal = 1;
+        }
+        tempArr[j] = tempVal;
+      }
+      this.drawDown[i] = tempArr;
+    }
+  }
+
+  clickCheck(_x, _y, _dragged) {
+    let dragged = _dragged; //action ie clicked or dragged
+    for (let i = 0; i < this.numShafts; i++) {
+      for (let j = 0; j < this.warpGrid[i].length; j++) {
+        if (this.warpGrid[i][j].withinBounds(_x, _y) && dragged) {
+          this.warpGrid[i][j].stateOn();
+        } else if (this.warpGrid[i][j].withinBounds(_x, _y)) {
+          this.warpGrid[i][j].stateFlip();
+        } 
+      }
+    }
+    for (let j = 0; j < this.tieUpGrid.length; j++) {
+      for (let i = 0; i < this.tieUpGrid.length; i++) {
+        if (this.tieUpGrid[i][j].withinBounds(_x, _y) && dragged) {
+          this.tieUpGrid[i][j].stateOn();
+        } else if (this.tieUpGrid[i][j].withinBounds(_x, _y)) {
+          this.tieUpGrid[i][j].stateFlip();
+        } 
+      }
+    }
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        if (this.treadlingGrid[i][j].withinBounds(_x, _y) && dragged) {
+          this.treadlingGrid[i][j].stateOn();
+        } else if (this.treadlingGrid[i][j].withinBounds(_x, _y)) {
+          this.treadlingGrid[i][j].stateFlip();
+        } 
+      }
+    }
+  }
+
+  getWarpState() {
+    let warpStateArr = init2dArray(this.warpGrid.length, this.warpGrid[0].length);
+    for (let i = 0; i < this.warpGrid.length; i++) {
+      for (let j = 0; j < this.warpGrid[i].length; j++) {
+        let tempState = this.warpGrid[i][j].state;
+        warpStateArr[i][j] = tempState;
+      }
+    }
+    return warpStateArr;
+  }
+
+  getTieUpState() {
+    let tieUpStateArr = init2dArray(this.tieUpGrid.length, this.tieUpGrid[0].length);
+    for (let i = 0; i < this.tieUpGrid.length; i++) {
+      for (let j = 0; j < this.tieUpGrid[i].length; j++) {
+        let tempState = this.tieUpGrid[i][j].state;
+        tieUpStateArr[i][j] = tempState;
+      }
+    }
+    return tieUpStateArr;
+  }
+
+  getTreadlingState() {
+    let treadlingStateArr = init2dArray(this.treadlingGrid.length, this.treadlingGrid[0].length);
+    for (let i = 0; i < this.treadlingGrid.length; i++) {
+      for (let j = 0; j < this.treadlingGrid[i].length; j++) {
+        let tempState = this.treadlingGrid[i][j].state;
+        treadlingStateArr[i][j] = tempState;
+      }
+    }
+    return treadlingStateArr;
+  }
+
+}

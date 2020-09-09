@@ -1,0 +1,151 @@
+/* 06 - Constallation Logics
+ *
+ *
+ *
+ */
+
+'use strict'
+
+//canvas vars
+let canvasWidth, canvasHeight;
+let canvasDiv = document.getElementById("draft06_div");
+let canvas;
+
+let numWarps, numRepeats, orgX, orgY, offX, offY, sz, wWidth, wHeight;
+
+let shapeBox, shapeGrid;
+
+let bg, fg;
+
+let treadlingArr = [];
+let shapeArr = [];
+
+function setup() {
+  ////init canvaiv');
+  canvasWidth = canvasDiv.offsetWidth;
+  canvasHeight = canvasDiv.offsetHeight;
+  canvas = createCanvas(canvasWidth, canvasHeight);
+  canvas.parent('draft06_div');
+
+  //var init
+  numWarps = 5;
+  offX = 0;
+  offY = 0;
+  orgX = offX;
+  orgY = offY;
+  sz = 20;
+  wWidth = canvasWidth-offX;
+  wHeight = canvasHeight-offY;
+
+  //colours
+  bg = 255;
+  fg = 0;
+
+  initShapeBox(orgX, orgY, (numWarps+1)*sz, (numWarps+1)*sz);
+
+  for (let i = 0; i < 5; i++) {
+    let x = random(shapeBox.x);
+    let y = random(shapeBox.y);
+    let tempVec = createVector(x,y);
+    v = new Vert(tempVec);
+    shapeArr.push(v)
+  }
+
+}  
+   
+function draw() {
+  displayShapeBox();
+  displayShapeDeco();
+  shapeArr.forEach(el => {
+    vert.display();
+  });
+}  
+   
+
+function initShapeBox(_x, _y, _w, _h) {
+  shapeBox = {
+    x: _x,
+      y: _y,
+      w: _w,
+      h: _h,
+  }
+}
+
+function displayShapeBox() {
+  noStroke();
+  fill(233);
+  rect(shapeBox.x, shapeBox.y, shapeBox.w, shapeBox.h);
+
+  stroke(fg);
+
+  for (let i = 0; i < numWarps; i++) {
+    for (let j = 0; j < numWarps; j++) {
+      let x = sz + (sz * i);
+      let y = sz + (sz * j);
+
+      line(shapeBox.x, y, shapeBox.w,y);
+      line(x, shapeBox.y, x, shapeBox.h);
+    }
+  }
+}
+
+// decorations of shapeBox
+function displayShapeDeco() {
+  let x = shapeBox.w/2;
+  let y = shapeBox.h/2;
+  let csz = 5; //cross size
+  let num = numWarps;
+
+  stroke(fg);
+  strokeWeight(0.1);
+  for (let i = 0; i < num; i++) {
+    let sz1 = i * (x/num);
+    // let sz1 = shapeBox.h/num;
+    let x1 = shapeBox.x + sz1;
+    let x2 = shapeBox.x - sz1;
+    let y1 = shapeBox.y + sz1;
+    let y2 = shapeBox.y - sz1;
+
+    line(x2 + x, shapeBox.y+y, x2 + x, shapeBox.y+y);
+    line(x1+x, shapeBox.y + y, x1+x, shapeBox.y+y);
+
+    line(shapeBox.x + x, y + y1, shapeBox.x + x, y + y1);
+    line(shapeBox.x + x, y + y2, shapeBox.x + x, y + y2);
+
+  }
+
+  strokeWeight(1);
+  stroke(fg);
+  line(x-csz, y-csz, x+csz, y+csz);
+  line(x-csz, y+csz, x+csz, y-csz);
+}
+
+
+
+//---------------------
+class Cell {
+  constructor(_posX, _posY, _sz) {
+    this.posX = _posX;
+    this.posY = _posY;
+    this.sz = _sz;
+  }
+
+  drawCell() {
+    stroke(255,0,0);
+    rect(this.posX, this.posY, this.sz, this.sz);
+  }
+}
+
+class Vert {
+  constructor(_pos) {
+    this.pos = _pos;
+  }
+
+  display() {
+    fill(255,0,0);
+    noStroke();
+   
+    ellipse(this.pos.x, this.pos.y, 3);
+  }
+
+}
