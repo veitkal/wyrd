@@ -17,7 +17,8 @@
 
     --clr-light: #fff;
     --clr-dark: #303030;
-    --clr-accent: #16e0bd;
+    /* --clr-accent: #16e0bd; */
+     --clr-accent:grey;
 
     --fs-h1: 2.0rem;
     --fs-h2: 2.5rem;
@@ -28,8 +29,8 @@
 
     /* UI */
     --ui-height: 1em;
-    --ui-bg: grey;
-    --ui-fg: white;
+    --ui-bg: white;
+    --ui-fg: black;
     --ui-fs: 1rem;
 }
 
@@ -160,6 +161,14 @@ body{
 
 .draft_nav-button{
     font-size: 3.5rem;
+    color: var(--clr-dar);
+    background-color: var(--clr-light);
+    border: 0;
+}
+.draft_nav-button:hover{
+    font-size: 3.5rem;
+    background-color: var(--clr-light);
+    color: var(--clr-accent);
     /* color: var(--clr-dar); */
     /* background-color: var(--clr-dark); */
     border: 0;
@@ -234,7 +243,7 @@ body{
     width: 100%;
     height: var(--ui-height);
     background: var(--ui-bg);
-    border: none;
+    border: solid;
     outline: none;
     opacity: 0.7;
     -webkit-transition: .2s;
@@ -333,12 +342,22 @@ input:checked + .draft_toggle-switch:before {
 }
 
 /* MEDIA */ 
-@media (min-width: 700px ) {
+@media (min-width: 0px ) {
     .canvas{
+        width: 90%;
+        height: 70vh;
+    }
+    .draft_info {
         width: 100%;
         height: 70vh;
     }
-    .draft_info{
+}
+@media (min-width: 700px ) {
+    .canvas{
+        width: 90%;
+        height: 70vh;
+    }
+    .draft_info {
         width: 100%;
         height: 70vh;
     }
@@ -356,9 +375,6 @@ input:checked + .draft_toggle-switch:before {
 }
 
 @media (min-width: 1200px) {
-    /* :root { */
-    /*     --ui-fs:1vw; */
-    /* } */
     .canvas{
         width: 50%;
         height: 70vh;
