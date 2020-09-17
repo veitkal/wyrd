@@ -26,41 +26,41 @@
         <div class="header">
             <div class="inner_header">
                 <div class="nav_words">
-                    <a class="nav_item" href="#words" class"=nav_link">WORDS</a>
+                    <a class="nav_item" href="../words.html" class"=nav_link">WORDS</a>
                 </div>
-                <!-- <div class="title_container"> -->
-                <!--     <a href="index.html" >wyrd<span>DRAFTS</span></a> -->
-                <!-- </div> -->
+                <div class="title_container">
+                    <!-- <a href="index.html" >wyrd<span>DRAFTS</span></a> -->
+                </div>
                 <div class="nav_drafts">
-                    <a class="nav_item" href="#drafts" class"=nav_link">DRAFTS</a>
+                    <!-- <a class="nav_item" href="#drafts" class"=nav_link">DRAFTS</a> -->
                 </div>
             </div>
         </div>
+        <br></br>
 
         <div class="draft_title">
-        <h1>Ant logics</h1>
+        <h1>Draft Waves</h1>
         </div>
-        <div class="canvas-container"> 
-          <a href="../draft06" class="draft_nav-button" >&#8592;</a>
-            <div id="draft07_div" class="canvas">
+        <div class="canvas-container">
+            <!-- <button class="draft_nav-button" >&#8592;</button> -->
+            <a href="../draft08" class="draft_nav-button" >&#8592;</a>
+            <!-- include the p5 sketch -->
+            <div id="draft01_div" class="canvas">
             </div>
-            <a href="../draft08" class="draft_nav-button" >&#8594;</a>
+            <a href="../draft03" class="draft_nav-button" >&#8594;</a>
         </div>
-
 
         <div class="draft_info">
-            <p>Shapes and constellations, spiral repetition and mutations<p>
+          <br></br>
+          <p>An experiment in draft mechanics, a simple way to explore how the different parts results in and draws out pattern. <b>Touch or click</b> on the different parts to enable movements and explore the connection between the different parts of the drafts and the patterns generated. <p>
         </div>
 
-        <!-- <div id="p5ts02"></div> -->
-        <!-- <div id="p5ts03"></div> -->
 
          <!-- sketch scripts -->
-         <script type="text/javascript" src="scripts/helpers.js"></script>
-         <script type="text/javascript" src="scripts/Ent.js"></script>
-         <script type="text/javascript" src="scripts/EntSystem.js"></script>
-         <script type="text/javascript" src="scripts/Cell.js"></script>
-         <script type="text/javascript" src="scripts/Pattern.js"></script>
          <script type="text/javascript" src="scripts/sketch.js"></script>
+         <script type="text/javascript" src="scripts/Cell.js"></script>
+         <script type="text/javascript" src="scripts/Draft.js"></script>
+         <script type="text/javascript" src="scripts/gol.js"></script>
+         <script type="text/javascript" src="scripts/helpers.js"></script>
     </body> 
 </html>

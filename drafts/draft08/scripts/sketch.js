@@ -80,6 +80,9 @@ function setup() {
    
 function draw() {
   background(bg);
+  if (canvasWidth > 600) {
+    scale(0.9,0.9);
+  }
 
   for (let i = 1; i < numCols; i++) {
     for (let j = 1; j < numRows; j++) {
@@ -101,24 +104,6 @@ function draw() {
   sample3.update();
   sample4.update();
 
-
-  // cellGrid.forEach((el) => {
-  //   el.forEach((cell) => {
-  //     cell.drawCell();
-  //   });
-  // });
-
-
-  // entArr.forEach(el => {
-  //   el.display();
-  // checkCurrState(el.midX, el.midY, el);
-  // });
-
-  // entSys.update();
-  // entSys.display();
-
-  // pattern.update(entSys.stateArr);
-  // pattern.display();
 
 }  
    
