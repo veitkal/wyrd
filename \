@@ -145,6 +145,7 @@ body{
 
 /* draft view */
 .canvas-container{
+    background: green;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -203,9 +204,9 @@ body{
     /* width: 400px; */
     /* height: 100vh; */
     /* height: var(--ui-height); */
-    /* display: flex; */
+    display: flex;
     /* justify-content: center; */
-    /* align-items: flex-start; */
+    align-items: flex-start;
     /* vertical-align: bottom; */
     /* margin-left: 10; */
     /* margin-right: 10; */
@@ -217,12 +218,11 @@ body{
     display: inline-block;
     background-color: var(--ui-bg);
     color: var(--ui-fg);
-    border: solid;
-    border-width: 2px;
+    border: none;
     opacity: 0.7;
     transition-duration: .2s;
-    margin: 5px;
-    padding: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
     text-align: center;
     font-size: var(--ui-fs);
 }
@@ -280,7 +280,7 @@ body{
 
 .draft_slider-text{
     position: relative;
-    bottom: 5px;
+    bottom: 10px;
     text-align: center;
     font-size: var(--ui-fs);
 }
