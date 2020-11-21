@@ -32,7 +32,7 @@
                     <!-- <a href="index.html" >wyrd<span>DRAFTS</span></a> -->
                 </div>
                 <div class="nav_drafts">
-                    <!-- <a class="nav_item" href="#drafts" class"=nav_link">DRAFTS</a> -->
+                    <a class="nav_item" href="../../content.html" class"=nav_link">CONTENT</a>
                 </div>
             </div>
         </div>
@@ -41,22 +41,27 @@
         <div class="draft_title">
         <h1>Draft Waves</h1>
         </div>
+        <div class="draft_info" id="info_div">
+          <br></br>
+          <p class="info_text">An experiment in draft mechanics, a simple way to explore how the different parts results in and draws out pattern. <b>Touch or click</b> on the different parts to enable movements and explore the connection between the different parts of the drafts and the patterns generated. <br></br> <b>TAP TO CONTINUE</b><p>
+        </div>
         <div class="canvas-container">
             <!-- <button class="draft_nav-button" >&#8592;</button> -->
+          <span></span>
             <a href="../draft08" class="draft_nav-button" >&#8592;</a>
             <!-- include the p5 sketch -->
             <div id="draft01_div" class="canvas">
             </div>
             <a href="../draft03" class="draft_nav-button" >&#8594;</a>
+          <span></span>
         </div>
+        
+            <button type="button" class="draft_button" id="info_button">INFO</button>
 
-        <div class="draft_info">
-          <br></br>
-          <p>An experiment in draft mechanics, a simple way to explore how the different parts results in and draws out pattern. <b>Touch or click</b> on the different parts to enable movements and explore the connection between the different parts of the drafts and the patterns generated. <p>
-        </div>
 
 
          <!-- sketch scripts -->
+         <script type="text/javascript" src="../../../scripts/script.js"></script>
          <script type="text/javascript" src="scripts/sketch.js"></script>
          <script type="text/javascript" src="scripts/Cell.js"></script>
          <script type="text/javascript" src="scripts/Draft.js"></script>

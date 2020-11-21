@@ -132,7 +132,6 @@ random_button.onclick = function() {
 }
 
 
-
 function threadLines() { stroke(fg);
   strokeWeight(1);
   for (let i = 0; i <= numRows; i++) {
