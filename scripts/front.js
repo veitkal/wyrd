@@ -26,7 +26,6 @@ function setup() {
     c = new Cell(tempX, startY + (i*sz), sz);
     cellArr.push(c);
   }
-  console.log(enterButton);
 }
 
 function draw() {
