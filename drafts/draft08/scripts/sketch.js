@@ -33,14 +33,22 @@ function setup() {
   ////init canvaiv');
   canvasWidth = canvasDiv.offsetWidth;
   canvasHeight = canvasDiv.offsetHeight;
+  
+  //decimate if mobile
+  if (canvasWidth < 600) {
+  canvasHeight *= 0.7;
+  }
+
   canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('draft08_div');
 
   // numWarps = 15; 
   numSamples = 3;
   numCols=28;
+  //extend if mobile
   sz = canvasWidth / numCols;
-  numRows=floor((canvasHeight)/sz);
+  numRows=round((canvasHeight)/sz);
+
   //colours
   bg = 255;
   fg = 0;
@@ -70,19 +78,26 @@ function setup() {
   // statesArr = entSys.stateArr;
   // pattern = new Pattern(statesArr,  0, canvasHeight/2+(2*sz), canvasWidth, canvasHeight/2, 10);
 
+  if (canvasWidth > 600) {
+  sample = new Sample(sz*4,sz*2,sz,8,8);
+  sample2 = new Sample(sz*16,sz*2,sz,8,8);
+  sample3 = new Sample(sz*4,sz*13,sz,8,8);
+  sample4 = new Sample(sz*16,sz*13,sz,8,8);
+  } else {
   sample = new Sample(sz*4,sz*4,sz,8,8);
   sample2 = new Sample(sz*16,sz*4,sz,8,8);
   sample3 = new Sample(sz*4,sz*16,sz,8,8);
   sample4 = new Sample(sz*16,sz*16,sz,8,8);
+  }
 
 
 }  
    
 function draw() {
   background(bg);
-  if (canvasWidth > 600) {
-    scale(0.9,0.9);
-  }
+  // if (canvasWidth > 600) {
+  //   scale(0.9,0.9);
+  // }
 
   for (let i = 1; i < numCols; i++) {
     for (let j = 1; j < numRows; j++) {

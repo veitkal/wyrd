@@ -11,6 +11,7 @@ infoDiv.addEventListener("click", function() {
 
 //toggles info text + styling
 infoButton.addEventListener("click", function() {
+  toggleState = !toggleState;
   if (toggleState) {
     infoDiv.style.zIndex = "1";
     infoDiv.style.opacity = "1";
@@ -22,7 +23,7 @@ infoButton.addEventListener("click", function() {
     info_button.style.opacity = "0.7";
     info_button.style.border = "none";
   }
-  toggleState = !toggleState;
 });
+
 
 
