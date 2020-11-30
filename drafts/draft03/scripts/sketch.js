@@ -122,14 +122,14 @@ function mousePressed() {
   clickCheck(mouseX, mouseY);
 }
 
-random_button.onclick = function() {
-  for (let i = 0; i < tieUp.length; i++) {
-    for (let j = 0; j < tieUp[0].length; j++) {
-      let randomState = random(2)>=1?true:false;
-      tieUp[i][j].state = randomState;
-    } 
-  }
-}
+// random_button.onclick = function() {
+//   for (let i = 0; i < tieUp.length; i++) {
+//     for (let j = 0; j < tieUp[0].length; j++) {
+//       let randomState = random(2)>=1?true:false;
+//       tieUp[i][j].state = randomState;
+//     } 
+//   }
+// }
 
 
 function threadLines() { stroke(fg);

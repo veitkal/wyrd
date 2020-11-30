@@ -51,10 +51,11 @@ h3{ font-size: var(--fs-h3) }
 html { font-size: 10px; }
 
 a {
-      font-family: var(--ff-secondary);
-    opacity: 1;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
+  font-family: var(--ff-secondary);
+  color: var(--ff-dark);
+  opacity: 1;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
 }
 a:visited {
     color: var(--clr-dark);
